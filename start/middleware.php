@@ -5,7 +5,10 @@ declare(strict_types=1);
 use Meulah\Application;
 
 return static function (Application $app): void {
-    // Register application-wide middleware here.
+    // Middleware runs in listed order for the request and reverse order for the response.
     //
-    // $app->middleware(...);
+    // $app->middleware(
+    //     $first,
+    //     $second,
+    // );
 };
