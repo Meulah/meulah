@@ -3,7 +3,7 @@
 This is the minimal application starter for the Meulah framework. It is intended to be installed with:
 
 ```bash
-composer create-project meulah/starter my-app
+composer create-project meulah/meulah my-app
 ```
 
 ## Start

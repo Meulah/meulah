@@ -1,11 +1,24 @@
 {
-"name": "meulah/meulah",
+    "name": "meulah/meulah",
     "description": "The application starter for the Meulah PHP framework.",
     "type": "project",
     "license": "MIT",
+    "keywords": [
+        "php",
+        "framework",
+        "application",
+        "starter",
+        "mvc",
+        "server-rendered"
+    ],
+    "homepage": "https://github.com/Meulah/meulah",
+    "support": {
+        "issues": "https://github.com/Meulah/meulah/issues",
+        "source": "https://github.com/Meulah/meulah"
+    },
     "require": {
-        "php": ">=8.1",
-        "meulah/framework": "^0.1"
+        "php": "^8.1",
+        "meulah/framework": "^0.2"
     },
     "autoload": {
         "psr-4": {
