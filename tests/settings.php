@@ -359,6 +359,33 @@ PHP
     $historyCount = $pdo->query('SELECT COUNT(*) FROM meulah_migrations')->fetchColumn();
     settingsEnsure($table === 'first_run_test', 'The migration was not executed.');
     settingsEnsure((int) $historyCount === 1, 'The migration was not safely repeatable.');
+
+    [$exitCode, $stdout, $stderr] = runSettingsProcess(
+        [PHP_BINARY, $root . '/meulah', 'migrate:rollback', $pathOption],
+        $root,
+        $environment,
+    );
+    settingsEnsure(
+        $exitCode === 0,
+        'Migration rollback failed: ' . $stdout . $stderr,
+    );
+
+    $table = $pdo->query(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'first_run_test'",
+    )->fetchColumn();
+    $historyCount = $pdo->query('SELECT COUNT(*) FROM meulah_migrations')->fetchColumn();
+    settingsEnsure($table === false, 'The rollback did not remove the migrated table.');
+    settingsEnsure((int) $historyCount === 0, 'The rollback did not clear migration history.');
+
+    [$exitCode, $stdout, $stderr] = runSettingsProcess(
+        [PHP_BINARY, $root . '/meulah', 'migrate:status', $pathOption],
+        $root,
+        $environment,
+    );
+    settingsEnsure(
+        $exitCode === 0,
+        'Migration status failed after rollback: ' . $stdout . $stderr,
+    );
     $pdo = null;
 } finally {
     if (is_file($migrationFile)) {

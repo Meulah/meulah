@@ -50,6 +50,20 @@
             "!/data/uploads/.gitignore"
         ]
     },
+    "scripts": {
+        "lint": "@php tests/lint.php",
+        "test": [
+            "@php tests/startup.php",
+            "@php tests/home.php",
+            "@php tests/settings.php",
+            "@php tests/cli.php",
+            "@php tests/distribution.php"
+        ],
+        "check": [
+            "@lint",
+            "@test"
+        ]
+    },
     "config": {
         "sort-packages": true
     },
