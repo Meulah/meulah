@@ -24,6 +24,8 @@ Generated files in `runtime/` may be cleared; persistent uploads belong in
 Use the root launcher for framework commands:
 
 ```bash
+php meulah --help
+php meulah --version
 php meulah make:migration create_users_table
 php meulah migrate
 php meulah migrate:status

@@ -5,6 +5,31 @@ declare(strict_types=1);
 
 use Meulah\Console\Launcher;
 
-require __DIR__ . '/vendor/autoload.php';
+$applicationRoot = __DIR__;
+$autoloader = $applicationRoot . '/vendor/autoload.php';
 
-exit(Launcher::runFrom(__DIR__, $argv));
+if (!is_file($autoloader)) {
+    fwrite(
+        STDERR,
+        "Error: Composer dependencies are missing. Run 'composer install' in the application root." . PHP_EOL,
+    );
+    exit(1);
+}
+
+try {
+    require_once $autoloader;
+
+    if (!class_exists(Launcher::class)) {
+        throw new RuntimeException('The Meulah console launcher is unavailable.');
+    }
+
+    $exitCode = Launcher::runFrom($applicationRoot, $argv);
+} catch (Throwable) {
+    fwrite(
+        STDERR,
+        "Error: Unable to start the Meulah CLI. Run 'composer install' and try again." . PHP_EOL,
+    );
+    exit(1);
+}
+
+exit($exitCode);
