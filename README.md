@@ -11,6 +11,10 @@ composer create-project meulah/meulah my-app
 1. Copy `.env.example` to `.env` and configure the application.
 2. Point the web server document root to `public/`.
 
+SQLite is the first-run database and stores its file at `data/database.sqlite`.
+The PHP PDO SQLite extension must be enabled. MySQL and PostgreSQL examples are
+available in `.env.example`; enable one database configuration at a time.
+
 The application starts in `start/app.php`. Application code belongs in `app/`,
 container bindings in `app/bindings.php`, routes in `routes/`, views in `views/`,
 settings in `settings/`, and migrations in `database/migrations/`.

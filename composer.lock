@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "280f3aa96784731cbc50b974b5c5b56b",
+    "content-hash": "42eaccc5d02d1265587cfaa0f7a98a12",
     "packages": [
         {
             "name": "meulah/framework",
@@ -68,7 +68,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "ext-pdo_sqlite": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

@@ -18,9 +18,10 @@ Environment::load($root . '/.env');
 $config = Repository::load($root . '/settings');
 $debug = $config->bool('app.debug');
 
+date_default_timezone_set($config->string('app.timezone'));
 error_reporting(E_ALL);
 ini_set('display_errors', $debug ? '1' : '0');
-ini_set('error_log', $root . '/runtime/logs/meulah.log');
+ini_set('error_log', $config->string('files.logs') . DIRECTORY_SEPARATOR . 'meulah.log');
 
 $container = new Container();
 $container->instance(Repository::class, $config);
