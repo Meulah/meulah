@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use Meulah\Config\Repository;
 use Meulah\Http\Response;
-use Meulah\Mvc\Controller;
+use Meulah\Http\ResponseInterface;
+use Meulah\View\View;
 
-final class HomeController extends Controller
+final class HomeController
 {
-    public function __invoke(): Response
+    public function __construct(
+        private readonly View $views,
+        private readonly Repository $config,
+    ) {
+    }
+
+    public function __invoke(): ResponseInterface
     {
-        return $this->view('home', ['title' => 'Meulah']);
+        return Response::html($this->views->render('home', [
+            'applicationName' => $this->config->string('app.name'),
+        ]));
     }
 }
