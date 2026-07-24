@@ -55,49 +55,24 @@ homeEnsure(
 $html = $response->content();
 
 foreach ([
-    'Meulah is running.',
-    'Request lifecycle',
-    'Three verified next steps',
-    'Persistent application-owned files.',
-    'Generated or regenerable runtime files.',
-    'not a claim that an application is production-ready',
-    'not implemented or enabled in Framework 0.2',
+    'Meulah is ready.',
+    'Application running',
+    'has booted successfully.',
+    'Edit <code>routes/web.php</code> to start building.',
+    'Framework 0.2',
+    'Plain PHP views. No frontend build step.',
 ] as $expectedText) {
     homeEnsure(str_contains($html, $expectedText), "Welcome page omitted: {$expectedText}");
 }
 
 foreach ([
-    'app/',
-    'start/',
-    'settings/',
-    'routes/',
-    'views/',
-    'database/',
-    'data/uploads/',
-    'runtime/',
-    'public/',
-] as $folder) {
-    homeEnsure(str_contains($html, $folder), "Welcome page omitted folder: {$folder}");
-}
-
-$lifecycle = [
-    'public/index.php',
-    'start/app.php',
-    'app/bindings.php',
-    'start/middleware.php',
-    'start/routes.php',
-    'routes/web.php',
-    'HomeController',
-    'views/home.php',
-    'Response',
-];
-$previousPosition = -1;
-
-foreach ($lifecycle as $stage) {
-    $position = strpos($html, $stage, $previousPosition + 1);
-    homeEnsure(is_int($position), "Request lifecycle omitted: {$stage}");
-    homeEnsure($position > $previousPosition, 'Request lifecycle is out of order.');
-    $previousPosition = $position;
+    'href="/assets/css/welcome.css"',
+    'src="/assets/images/meulah-logo.png"',
+    'alt="Meulah"',
+    'width="732"',
+    'height="171"',
+] as $assetMarker) {
+    homeEnsure(str_contains($html, $assetMarker), "Welcome asset marker missing: {$assetMarker}");
 }
 
 foreach ([
@@ -107,29 +82,16 @@ foreach ([
     homeEnsure(str_contains($html, 'href="' . $repositoryUrl . '"'), "Missing link: {$repositoryUrl}");
 }
 
-preg_match_all('/<code class="command">([^<]+)<\/code>/', $html, $commandMatches);
-$commands = array_map(
-    static fn (string $command): string => html_entity_decode($command, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-    $commandMatches[1] ?? [],
-);
-homeEnsure(
-    $commands === ['php meulah --help', 'php meulah migrate:status'],
-    'The welcome page displays unverified or missing commands.',
-);
-homeEnsure(!str_contains($html, 'php meulah serve'), 'The welcome page advertises an unsupported serve command.');
-homeEnsure(!str_contains($html, 'make:controller'), 'The welcome page advertises an unsupported generator.');
+foreach (['php meulah --help', 'php meulah migrate:status'] as $command) {
+    homeEnsure(substr_count($html, $command) === 1, "Welcome command missing or duplicated: {$command}");
+}
 
+homeEnsure(stripos($html, '<style') === false, 'The welcome page contains inline CSS.');
+homeEnsure(stripos($html, ' style=') === false, 'The welcome page contains inline style attributes.');
 homeEnsure(stripos($html, '<script') === false, 'The welcome page contains JavaScript.');
 homeEnsure(
-    preg_match(
-        '/<(?:link|script|img|iframe|source|video|audio)\b[^>]*(?:href|src)\s*=\s*["\'](?:https?:)?\/\//i',
-        $html,
-    ) !== 1,
+    preg_match('/<(?:link|script|img)\b[^>]*(?:href|src)\s*=\s*["\'](?:https?:)?\/\//i', $html) !== 1,
     'The welcome page loads a remote asset.',
-);
-homeEnsure(
-    preg_match('/url\(\s*["\']?https?:\/\//i', $html) !== 1,
-    'The welcome page CSS loads a remote asset.',
 );
 
 foreach ([
@@ -137,11 +99,29 @@ foreach ([
     '<meta name="viewport"',
     'class="skip-link"',
     'href="#main-content"',
-    '<main id="main-content">',
-    ':focus-visible',
-] as $accessibilityMarker) {
-    homeEnsure(str_contains($html, $accessibilityMarker), "Accessibility marker missing: {$accessibilityMarker}");
+    '<main class="welcome" id="main-content">',
+    'aria-labelledby="welcome-title"',
+    'aria-label="Useful first commands"',
+    'aria-label="Meulah repositories"',
+] as $marker) {
+    homeEnsure(str_contains($html, $marker), "Accessibility marker missing: {$marker}");
 }
+
+foreach (['Request lifecycle', 'Know where things belong', 'Three verified next steps', 'Opia'] as $removed) {
+    homeEnsure(!str_contains($html, $removed), "Busy welcome section remains: {$removed}");
+}
+
+$stylesheet = file_get_contents($root . '/public/assets/css/welcome.css');
+homeEnsure(is_string($stylesheet), 'The welcome stylesheet is missing.');
+homeEnsure(str_contains($stylesheet, ':focus-visible'), 'The stylesheet has no visible focus treatment.');
+homeEnsure(str_contains($stylesheet, '@media (max-width: 38rem)'), 'The stylesheet has no responsive rule.');
+homeEnsure(str_contains($stylesheet, '@media (prefers-reduced-motion: reduce)'), 'Reduced motion is unsupported.');
+homeEnsure(preg_match('/https?:\/\//i', $stylesheet) !== 1, 'The stylesheet loads a remote asset.');
+
+$logoInfo = getimagesize($root . '/public/assets/images/meulah-logo.png');
+homeEnsure(is_array($logoInfo), 'The Meulah logo is missing or invalid.');
+homeEnsure(($logoInfo[0] ?? null) === 732 && ($logoInfo[1] ?? null) === 171, 'The Meulah logo dimensions changed.');
+homeEnsure(($logoInfo['mime'] ?? null) === 'image/png', 'The Meulah logo is not PNG.');
 
 $hostileName = '<img src=x onerror=alert(1)>';
 $hostileController = new HomeController(
@@ -150,27 +130,11 @@ $hostileController = new HomeController(
 );
 $escapedHtml = $hostileController()->content();
 homeEnsure(!str_contains($escapedHtml, $hostileName), 'Dynamic application name was not escaped.');
-homeEnsure(
-    str_contains($escapedHtml, '&lt;img src=x onerror=alert(1)&gt;'),
-    'Escaped application name is missing.',
-);
+homeEnsure(str_contains($escapedHtml, '&lt;img src=x onerror=alert(1)&gt;'), 'Escaped name is missing.');
 
 $controllerSource = file_get_contents($root . '/app/Controllers/HomeController.php');
 homeEnsure(is_string($controllerSource), 'Unable to inspect HomeController.');
 homeEnsure(!str_contains($controllerSource, 'container('), 'HomeController performs a container lookup.');
 homeEnsure(!str_contains($controllerSource, 'Facade'), 'HomeController uses a facade.');
-
-$opiaFiles = [];
-$viewFiles = new RecursiveIteratorIterator(
-    new RecursiveDirectoryIterator($root . '/views', FilesystemIterator::SKIP_DOTS),
-);
-
-foreach ($viewFiles as $file) {
-    if ($file->isFile() && strtolower($file->getExtension()) === 'opia') {
-        $opiaFiles[] = $file->getPathname();
-    }
-}
-
-homeEnsure($opiaFiles === [], 'The starter contains an Opia template.');
 
 echo "Home route and welcome page tests passed.\n";
