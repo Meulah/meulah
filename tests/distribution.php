@@ -17,9 +17,13 @@ function distributionEnsure(bool $condition, string $message): void
     }
 }
 
-/** @return list<string> */
-function trackedFiles(string $root): array
+/** @return list<string>|null */
+function trackedFiles(string $root): ?array
 {
+    if (!is_dir($root . '/.git')) {
+        return null;
+    }
+
     $process = proc_open(
         ['git', 'ls-files', '-z'],
         [
@@ -47,6 +51,33 @@ function trackedFiles(string $root): array
     }
 
     return array_values(array_filter(explode("\0", $stdout), static fn (string $file): bool => $file !== ''));
+}
+
+/** @return list<string> */
+function applicationSourceFiles(string $root): array
+{
+    $files = ['.env.example', 'README.md', 'SECURITY.md', 'composer.json', 'meulah'];
+
+    foreach (['app', 'start', 'settings', 'routes', 'views', 'database', 'public'] as $directory) {
+        $path = $root . '/' . $directory;
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || $file->isLink()) {
+                continue;
+            }
+
+            $relative = substr($file->getPathname(), strlen($root) + 1);
+            $files[] = str_replace('\\', '/', $relative);
+        }
+    }
+
+    $files = array_values(array_unique($files));
+    sort($files, SORT_STRING);
+
+    return $files;
 }
 
 /** @return array<string, mixed> */
@@ -181,32 +212,28 @@ foreach ($publicIterator as $entry) {
 }
 
 $tracked = trackedFiles($root);
-$forbiddenTracked = array_values(array_filter(
-    $tracked,
-    static function (string $file): bool {
-        return $file === '.env'
-            || (str_starts_with($file, '.env.') && $file !== '.env.example')
-            || str_starts_with($file, 'vendor/')
-            || $file === 'data/database.sqlite'
-            || (str_starts_with($file, 'data/uploads/') && $file !== 'data/uploads/.gitignore')
-            || (
-                str_starts_with($file, 'runtime/')
-                && preg_match('#^runtime/(cache|logs|sessions|views)/\.gitignore$#', $file) !== 1
-            );
-    },
-));
-distributionEnsure(
-    $forbiddenTracked === [],
-    'Generated or private distribution files are tracked: ' . implode(', ', $forbiddenTracked),
-);
+if ($tracked !== null) {
+    $forbiddenTracked = array_values(array_filter(
+        $tracked,
+        static function (string $file): bool {
+            return $file === '.env'
+                || (str_starts_with($file, '.env.') && $file !== '.env.example')
+                || str_starts_with($file, 'vendor/')
+                || $file === 'data/database.sqlite'
+                || (str_starts_with($file, 'data/uploads/') && $file !== 'data/uploads/.gitignore')
+                || (
+                    str_starts_with($file, 'runtime/')
+                    && preg_match('#^runtime/(cache|logs|sessions|views)/\.gitignore$#', $file) !== 1
+                );
+        },
+    ));
+    distributionEnsure(
+        $forbiddenTracked === [],
+        'Generated or private distribution files are tracked: ' . implode(', ', $forbiddenTracked),
+    );
+}
 
-$applicationFiles = array_filter(
-    $tracked,
-    static fn (string $file): bool => in_array($file, ['meulah', 'composer.json', '.env.example'], true)
-        || preg_match('#^(app|start|settings|routes|views|public)/#', $file) === 1,
-);
-
-foreach ($applicationFiles as $file) {
+foreach (applicationSourceFiles($root) as $file) {
     $contents = file_get_contents($root . '/' . $file);
 
     if (!is_string($contents)) {
