@@ -26,6 +26,30 @@
             "App\\": "app/"
         }
     },
+    "archive": {
+        "exclude": [
+            "/.github",
+            "/.env",
+            "/.env.*",
+            "!/.env.example",
+            "/vendor",
+            "/coverage",
+            "/test-results",
+            "/.phpunit.cache",
+            "/.phpunit.result.cache",
+            "/runtime/cache/*",
+            "!/runtime/cache/.gitignore",
+            "/runtime/logs/*",
+            "!/runtime/logs/.gitignore",
+            "/runtime/sessions/*",
+            "!/runtime/sessions/.gitignore",
+            "/runtime/views/*",
+            "!/runtime/views/.gitignore",
+            "/data/database.sqlite",
+            "/data/uploads/*",
+            "!/data/uploads/.gitignore"
+        ]
+    },
     "config": {
         "sort-packages": true
     },

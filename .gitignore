@@ -1,9 +1,53 @@
+# Environment
 /.env
+/.env.*
+!/.env.example
+
+# Dependencies
 /vendor/
+
+# Generated or regenerable runtime output
+/runtime/*
+!/runtime/cache/
+!/runtime/logs/
+!/runtime/sessions/
+!/runtime/views/
+/runtime/cache/*
+!/runtime/cache/.gitignore
+/runtime/logs/*
+!/runtime/logs/.gitignore
+/runtime/sessions/*
+!/runtime/sessions/.gitignore
+/runtime/views/*
+!/runtime/views/.gitignore
+
+# Persistent application-owned data
 /data/database.sqlite
-/.idea/
-/.vscode/
+/data/uploads/*
+!/data/uploads/.gitignore
+
+# Coverage and test artifacts
+/coverage/
+/test-results/
 /.phpunit.cache/
 /.phpunit.result.cache
+/coverage.xml
+/junit.xml
+*.test.sqlite
+
+# Editors and IDEs
+/.idea/
+/.vscode/
+*.code-workspace
+
+# Operating system files
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
