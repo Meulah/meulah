@@ -14,9 +14,11 @@ if (!is_file($autoloader)) {
 require_once $autoloader;
 
 /** @var Meulah\Application $app */
-$app = require $root . '/bootstrap.php';
-$router = $app->router();
-require $root . '/routes/web.php';
+$app = require $root . '/start/app.php';
+
+/** @var callable(Meulah\Routing\Router): void $routes */
+$routes = require $root . '/start/routes.php';
+$routes($app->router());
 
 try {
     $request = Request::capture($app->config()->int('http.max_body_size'));

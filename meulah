@@ -3,8 +3,8 @@
 
 declare(strict_types=1);
 
-use Meulah\Console\Application;
+use Meulah\Console\Launcher;
 
 require __DIR__ . '/vendor/autoload.php';
 
-exit(Application::runFrom(__DIR__, $argv));
+exit(Launcher::runFrom(__DIR__, $argv));

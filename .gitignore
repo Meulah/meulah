@@ -1,6 +1,6 @@
 /.env
 /vendor/
-/database.sqlite
+/data/database.sqlite
 /.idea/
 /.vscode/
 /.phpunit.cache/

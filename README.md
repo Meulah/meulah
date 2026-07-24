@@ -11,7 +11,11 @@ composer create-project meulah/meulah my-app
 1. Copy `.env.example` to `.env` and configure the application.
 2. Point the web server document root to `public/`.
 
-Application code belongs in `app/`, routes in `routes/`, views in `resources/views/`, configuration in `config/`, and migrations in `database/migrations/`.
+The application starts in `start/app.php`. Application code belongs in `app/`,
+container bindings in `app/bindings.php`, routes in `routes/`, views in `views/`,
+settings in `settings/`, and migrations in `database/migrations/`.
+Generated files in `runtime/` may be cleared; persistent uploads belong in
+`data/uploads/` and are deliberately kept outside `public/`.
 
 Use the root launcher for framework commands:
 

@@ -8,7 +8,7 @@ $driver = strtolower((string) Environment::get('DB_DRIVER', 'mysql'));
 $defaultPort = in_array($driver, ['pgsql', 'postgres', 'postgresql'], true) ? 5432 : 3306;
 $configuredPort = Environment::get('DB_PORT');
 $port = $configuredPort === null || $configuredPort === '' ? $defaultPort : (int) $configuredPort;
-$sqlitePath = (string) Environment::get('DB_PATH', 'database.sqlite');
+$sqlitePath = (string) Environment::get('DB_PATH', 'data/database.sqlite');
 
 if (
     $sqlitePath !== ':memory:'
