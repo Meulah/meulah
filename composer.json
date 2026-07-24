@@ -14,7 +14,8 @@
     "homepage": "https://github.com/Meulah/meulah",
     "support": {
         "issues": "https://github.com/Meulah/meulah/issues",
-        "source": "https://github.com/Meulah/meulah"
+        "source": "https://github.com/Meulah/meulah",
+        "security": "https://github.com/Meulah/meulah/security/policy"
     },
     "require": {
         "php": "^8.1",
